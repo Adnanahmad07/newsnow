@@ -17,7 +17,7 @@ export default function News() {
     const observer = useRef(null);
 
     const fetchNews = async (page = 1) => {
-        const apiKey = 'e50a1090ee37502a093e38664bec18e7';
+        const apiKey = '4b84b8a2fbcfac1b8139b0b74eaf3d2e';
         const url = `http://api.mediastack.com/v1/news?access_key=${apiKey}&countries=in&limit=10&offset=${(page - 1) * 10}`;
 
         try {
