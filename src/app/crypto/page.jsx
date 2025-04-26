@@ -12,7 +12,7 @@ export default function Crypto() {
         const fetchNews = async () => {
             try {
                 const response = await fetch(
-                    `http://api.mediastack.com/v1/news?access_key=4b84b8a2fbcfac1b8139b0b74eaf3d2e&keywords=crypto&languages=en&limit=20`
+                    `https://gnews.io/api/v4/top-headlines?category=business&q=crypto&apikey=d4260d9d7705ca6fdf60a880775c3782&max=20`
                 );
 
                 if (!response.ok) {
@@ -21,11 +21,13 @@ export default function Crypto() {
 
                 const data = await response.json();
 
-                if (!data.data) {
+                if (!data.articles) {
                     throw new Error('No crypto articles found in response');
                 }
 
-                setNews(data.data || []);
+                setNews(data.articles || []);
+                // Cache the articles
+                localStorage.setItem('crypto-articles', JSON.stringify(data.articles));
             } catch (err) {
                 setError(err.message);
                 console.error('Crypto fetch error:', err);

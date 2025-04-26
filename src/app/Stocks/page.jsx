@@ -1,19 +1,17 @@
-// /stocks/page.jsx
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import {
-    LineChart,
-    Line,
+    ComposedChart,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     ResponsiveContainer,
+    Bar,
 } from 'recharts';
 import { motion } from 'framer-motion';
 
@@ -22,7 +20,7 @@ export default function StocksPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [symbol, setSymbol] = useState('AAPL');
-    const [dataType, setDataType] = useState('TIME_SERIES_DAILY'); // Default data type
+    const [dataType, setDataType] = useState('TIME_SERIES_DAILY');
 
     const apiKey = '5CCALCYLRZ2704R1';
 
@@ -61,17 +59,24 @@ export default function StocksPage() {
         fetchStockData();
     };
 
-    const chartData = stockData
-        ? Object.entries(stockData['Time Series (Daily)'] || stockData['Time Series (Intraday)'] || stockData['Weekly Time Series'])
+    const timeSeries = stockData?.['Time Series (Daily)'] ||
+        stockData?.['Time Series (Intraday)'] ||
+        stockData?.['Weekly Time Series'];
+
+    const chartData = timeSeries
+        ? Object.entries(timeSeries)
             .map(([date, data]) => ({
                 date,
+                open: parseFloat(data['1. open']),
+                high: parseFloat(data['2. high']),
+                low: parseFloat(data['3. low']),
                 close: parseFloat(data['4. close']),
             }))
             .reverse()
         : [];
 
     const getPriceChangeColor = (current, previous) => {
-        if (!previous) return 'bg-gray-100'; // Default background color
+        if (!previous) return 'bg-gray-100';
         return current > previous ? 'bg-green-100' : 'bg-red-100';
     };
 
@@ -99,23 +104,83 @@ export default function StocksPage() {
                     {loading ? 'Loading...' : 'Search'}
                 </Button>
             </form>
+
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
                     Error: {error}
                 </div>
             )}
-            {stockData && (stockData['Time Series (Daily)'] || stockData['Time Series (Intraday)'] || stockData['Weekly Time Series']) && (
+
+            {timeSeries && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                     className="space-y-6"
                 >
+                    {/* Candlestick Chart First */}
+                    <Card className="w-full">
+                        <CardHeader>
+                            <CardTitle>Candlestick Chart</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[400px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ComposedChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" hide />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Bar
+                                            dataKey="open"
+                                            fill="#ffffff00"
+                                            shape={(props) => {
+                                                const { x, y, width, height, payload } = props;
+                                                const open = payload.open;
+                                                const close = payload.close;
+                                                const high = payload.high;
+                                                const low = payload.low;
+                                                const color = close > open ? '#4ade80' : '#f87171'; // green or red
+
+                                                const top = Math.min(open, close);
+                                                const barHeight = Math.abs(close - open);
+
+                                                return (
+                                                    <>
+                                                        {/* Vertical line (high to low) */}
+                                                        <line
+                                                            x1={x + width / 2}
+                                                            y1={y + (high - Math.max(open, close)) * height / (high - low)}
+                                                            x2={x + width / 2}
+                                                            y2={y + (low - Math.min(open, close)) * height / (high - low)}
+                                                            stroke={color}
+                                                            strokeWidth={1}
+                                                        />
+                                                        {/* Candle body */}
+                                                        <rect
+                                                            x={x}
+                                                            y={y + (Math.min(open, close) - low) * height / (high - low)}
+                                                            width={width}
+                                                            height={barHeight * height / (high - low)}
+                                                            fill={color}
+                                                        />
+                                                    </>
+                                                );
+                                            }}
+                                        />
+                                    </ComposedChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Then the Cards */}
                     <div className="grid grid-cols-2 gap-4">
-                        {Object.entries(stockData['Time Series (Daily)'] || stockData['Time Series (Intraday)'] || stockData['Weekly Time Series'])
+                        {Object.entries(timeSeries)
                             .slice(0, 4)
                             .map(([date, data], index, arr) => {
-                                const previousClose = index < arr.length - 1 ? parseFloat(arr[index + 1][1]['4. close']) : null;
+                                const previousClose =
+                                    index < arr.length - 1 ? parseFloat(arr[index + 1][1]['4. close']) : null;
                                 const currentClose = parseFloat(data['4. close']);
                                 const priceChangeColor = getPriceChangeColor(currentClose, previousClose);
 
@@ -137,31 +202,6 @@ export default function StocksPage() {
                                 );
                             })}
                     </div>
-
-                    <Card className="w-full">
-                        <CardHeader>
-                            <CardTitle>Stock Price Chart</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="h-[400px]">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="date" />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="close"
-                                            stroke="#8884d8"
-                                            activeDot={{ r: 8 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </CardContent>
-                    </Card>
                 </motion.div>
             )}
         </div>

@@ -1,4 +1,3 @@
-// /news/page.jsx
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -17,13 +16,13 @@ export default function News() {
     const observer = useRef(null);
 
     const fetchNews = async (page = 1) => {
-        const apiKey = '260ec10be272473d9a654d42c9d6e35f'; // Replace with your NewsAPI key
-        const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}&page=${page}&pageSize=10`;
+        const apiKey = 'd4260d9d7705ca6fdf60a880775c3782'; // GNews API key
+        const url = `https://gnews.io/api/v4/top-headlines?country=us&apikey=${apiKey}&page=${page}&max=10`;
 
         try {
             const response = await fetch(url);
             const data = await response.json();
-            if (data.articles.length > 0) {
+            if (data.articles && data.articles.length > 0) {
                 setNews((prevNews) => (page === 1 ? data.articles : [...prevNews, ...data.articles]));
             } else {
                 setHasMore(false);
@@ -101,11 +100,15 @@ export default function News() {
                         >
                             <Link href={`/news/${encodeURIComponent(article.title)}`} passHref>
                                 <Card className="h-full flex flex-col cursor-pointer hover:shadow-lg transition-shadow">
-                                    {article.urlToImage && (
+                                    {article.image && (
                                         <img
-                                            src={article.urlToImage}
+                                            src={article.image}
                                             alt={article.title}
                                             className="w-full h-48 object-cover rounded-t-lg"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                                            }}
                                         />
                                     )}
                                     <CardHeader>
