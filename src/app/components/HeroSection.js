@@ -9,6 +9,7 @@ import { SignInButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import CustomA from "../components/CustomA.jsx"
+import CustomB from "../components/CustomB.jsx"
 
 const features = [
     {
@@ -127,6 +128,8 @@ export default function HeroSection() {
 
             {/* Only show CustomA when user is logged in */}
             {isLoaded && user && <CustomA />}
+            {isLoaded && user && <CustomB />}
+
         </div>
     )
 }

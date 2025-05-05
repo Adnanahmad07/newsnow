@@ -169,7 +169,7 @@ export default function CustomA({
 
                     <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
                         <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-                            Crafting exceptional digital experiences through innovative design and cutting-edge technology.
+                            NewsKnow delivers intelligent, real-time insights—transforming information into knowledge with precision and clarity
                         </p>
                     </motion.div>
                 </div>
