@@ -63,9 +63,9 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`fixed w-full z-50 flex justify-between items-center p-4 ${isScrolled
-                ? "bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm"
-                : "bg-white/90 backdrop-blur-md"
+            className={`fixed w-full z-50 flex justify-between items-center  p-4 ${isScrolled
+                ? "backdrop-blur-xl bg-black/50"
+                : "backdrop-blur-xl bg-black/50"
                 }`}
         >
             {/* Logo and Brand Name */}
@@ -86,10 +86,7 @@ export default function Navbar() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="hidden sm:flex items-center gap-1"
                 >
-                    <span className="text-red-800 font-bold text-xl sm:text-2xl">N</span>
-                    <span className="text-black text-lg sm:text-xl">ews</span>
-                    <span className="text-red-800 font-bold text-xl sm:text-2xl">N</span>
-                    <span className="text-black text-lg sm:text-xl">ow</span>
+                    <p className="text-2xl font-semibold text-red-700">NewsNow</p>
                 </motion.span>
             </Link>
 
@@ -104,9 +101,9 @@ export default function Navbar() {
                     <Link
                         key={link.name}
                         href={link.href}
-                        className={`px-3 py-1 rounded-md text-sm lg:text-base transition-colors ${isActive(link.href)
-                            ? "bg-purple-100 border border-gray-100 text-gray-900 font-medium"
-                            : "text-gray-700 hover:text-purple-600 hover:bg-gray-50"
+                        className={`px-3 py-1 rounded-md text-sm lg:text-base transition-colors  ${isActive(link.href)
+                            ? "bg-gray-950   text-gray-200 font-medium"
+                            : "text-gray-400 hover:text-gray-200 hover:bg-gray-950"
                             }`}
                     >
                         {link.name}
@@ -183,7 +180,17 @@ export default function Navbar() {
             {/* Desktop Auth Button */}
             <div className="hidden md:block">
                 {isSignedIn ? (
-                    <UserButton afterSignOutUrl="/" afterSignInUrl="/News" showName />
+                    <UserButton
+                        afterSignOutUrl="/"
+                        afterSignInUrl="/News"
+                        showName
+                        appearance={{
+                            elements: {
+                                userButtonBox: "flex-row-reverse gap-3",
+                                userButtonOuterIdentifier: "text-gray-50"
+                            }
+                        }}
+                    />
                 ) : (
                     <Link href="/sign-in">
                         <Button variant="outline">Login</Button>

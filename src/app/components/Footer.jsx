@@ -6,11 +6,9 @@ import { Sun, Moon, Monitor } from "lucide-react"; // Icons for dark/light/syste
 
 const Footer = () => {
     return (
-        <motion.footer
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-gray-900 text-white py-12"
+        <footer
+
+            className="bg-black text-white py-12"
         >
             <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* First Div: Brand Name, Subheadline, and Social Icons */}
@@ -98,7 +96,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-        </motion.footer>
+        </footer>
     );
 };
 
